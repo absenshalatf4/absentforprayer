@@ -1,0 +1,497 @@
+
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Absensi Shalat Dzuhur XI F-4 | SMAN 1 Lembang</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        emerald: {
+                            400: '#34d399',
+                            500: '#10b981',
+                            600: '#059669',
+                            900: '#064e3b',
+                        },
+                        dark: {
+                            900: '#0B0F17',
+                            800: '#111827',
+                            700: '#1F2937',
+                            600: '#374151'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0B0F17;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1F2937;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #10b981;
+        }
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-card {
+            background: rgba(31, 41, 55, 0.5);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-card:hover {
+            border-color: rgba(16, 185, 129, 0.4);
+            transform: translateY(-2px);
+        }
+        .active-tab {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+            color: #ffffff !important;
+            border-color: #34d399 !important;
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.35);
+        }
+        .active-tab i, .active-tab span {
+            color: #ffffff !important;
+        }
+    </style>
+</head>
+<body class="bg-dark-900 text-slate-100 min-h-screen font-sans antialiased selection:bg-emerald-500 selection:text-white pb-12">
+
+    <!-- Ornamen Background Glowing -->
+    <div class="fixed top-0 left-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="fixed bottom-0 right-1/4 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+    <div class="max-w-3xl mx-auto px-4 pt-6">
+
+        <!-- Header Aplikasi -->
+        <header class="glass-panel rounded-3xl p-6 mb-6 relative overflow-hidden shadow-2xl">
+            <div class="absolute -right-8 -top-8 w-32 h-32 bg-emerald-500/20 rounded-full blur-2xl"></div>
+            
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4 relative z-10">
+                <div class="flex items-center gap-4 text-center md:text-left">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center text-white shadow-lg shadow-emerald-500/30 flex-shrink-0">
+                        <i data-lucide="sun" class="w-8 h-8"></i>
+                    </div>
+                    <div>
+                        <span class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 mb-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                            SMA Negeri 1 Lembang
+                        </span>
+                        <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-white">Absensi Shalat Dzuhur</h1>
+                        <p class="text-xs text-slate-400">Kelas XI (Fase F-4) • Wali Kelas: Sensei Sri Haryati, S.Pd.</p>
+                    </div>
+                </div>
+
+                <button id="configBtn" onclick="toggleConfigModal()" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-semibold transition flex items-center gap-2 hover:text-white">
+                    <i data-lucide="settings" class="w-4 h-4"></i>
+                    <span>URL Spreadsheet</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Form Absensi -->
+        <main class="space-y-5">
+
+            <!-- FITUR 1: PILIH HARI (Laporan Seminggu Sekali) -->
+            <section class="glass-panel rounded-2xl p-5 shadow-xl">
+                <div class="flex items-center justify-between mb-3">
+                    <label class="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-2">
+                        <i data-lucide="calendar-days" class="w-4 h-4"></i>
+                        Pilih Hari (Laporan Mingguan)
+                    </label>
+                    <span id="currentDateDisplay" class="text-xs text-slate-400 bg-slate-800/80 px-3 py-1 rounded-full border border-slate-700">--/--/----</span>
+                </div>
+
+                <div class="grid grid-cols-7 gap-1.5 sm:gap-2" id="daySelector">
+                    <!-- Tombol Hari Diisi via Javascript -->
+                </div>
+            </section>
+
+            <!-- FITUR 2: PILIH NAMA SISWA -->
+            <section class="glass-panel rounded-2xl p-5 shadow-xl">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                    <label class="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-2">
+                        <i data-lucide="user-check" class="w-4 h-4"></i>
+                        Pilih Nama Siswa
+                    </label>
+                    <span id="genderCount" class="text-xs text-slate-400">L: 17 | P: 28 • Total: 45 Siswa</span>
+                </div>
+
+                <!-- Live Search Box -->
+                <div class="relative mb-3">
+                    <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-3.5 text-slate-400"></i>
+                    <input type="text" id="searchStudent" oninput="filterStudents()" placeholder="Cari nama atau nomor absen..." class="w-full bg-dark-900/80 border border-slate-700/80 text-sm text-slate-100 rounded-xl pl-10 pr-4 py-2.5 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition">
+                </div>
+
+                <!-- Dropdown Opsi Nama Siswa -->
+                <div class="relative">
+                    <select id="studentSelect" class="w-full bg-dark-900/90 border border-slate-700 text-slate-100 font-medium text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition cursor-pointer">
+                        <option value="" disabled selected>-- Ketuk untuk memilih nama siswa --</option>
+                    </select>
+                </div>
+            </section>
+
+            <!-- FITUR 3: STATUS ABSENSI SHALAT DZUHUR & KEHADIRAN -->
+            <section class="glass-panel rounded-2xl p-5 shadow-xl">
+                <label class="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-2 mb-3">
+                    <i data-lucide="check-square" class="w-4 h-4"></i>
+                    Status Shalat Dzuhur & Kehadiran
+                </label>
+
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3" id="attendanceStatusGrid">
+                    <!-- Shalat -->
+                    <button type="button" onclick="setAttendanceStatus('Shalat')" id="status-Shalat" class="glass-card rounded-2xl p-4 flex flex-col items-center justify-center text-center transition hover:border-emerald-500 active-tab">
+                        <i data-lucide="users" class="w-7 h-7 mb-1.5 text-emerald-400"></i>
+                        <span class="text-xs font-bold">Shalat</span>
+                        <span class="text-[10px] text-slate-400 mt-0.5">Melaksanakan Shalat</span>
+                    </button>
+
+                    <!-- Halangan / Haid -->
+                    <button type="button" onclick="setAttendanceStatus('Halangan (Haid)')" id="status-Halangan (Haid)" class="glass-card rounded-2xl p-4 flex flex-col items-center justify-center text-center transition hover:border-purple-500">
+                        <i data-lucide="heart-off" class="w-7 h-7 mb-1.5 text-purple-400"></i>
+                        <span class="text-xs font-bold">Halangan (Haid)</span>
+                        <span class="text-[10px] text-slate-400 mt-0.5">Khusus Siswi</span>
+                    </button>
+
+                    <!-- Sakit -->
+                    <button type="button" onclick="setAttendanceStatus('Tidak Sekolah (Sakit)')" id="status-Tidak Sekolah (Sakit)" class="glass-card rounded-2xl p-4 flex flex-col items-center justify-center text-center transition hover:border-amber-500">
+                        <i data-lucide="thermometer" class="w-7 h-7 mb-1.5 text-amber-400"></i>
+                        <span class="text-xs font-bold">Sakit</span>
+                        <span class="text-[10px] text-slate-400 mt-0.5">Tidak Masuk Sekolah</span>
+                    </button>
+
+                    <!-- Izin -->
+                    <button type="button" onclick="setAttendanceStatus('Tidak Sekolah (Izin)')" id="status-Tidak Sekolah (Izin)" class="glass-card rounded-2xl p-4 flex flex-col items-center justify-center text-center transition hover:border-blue-500">
+                        <i data-lucide="file-text" class="w-7 h-7 mb-1.5 text-blue-400"></i>
+                        <span class="text-xs font-bold">Izin</span>
+                        <span class="text-[10px] text-slate-400 mt-0.5">Izin Disertai Surat/Keterangan</span>
+                    </button>
+
+                    <!-- Alfa -->
+                    <button type="button" onclick="setAttendanceStatus('Tidak Sekolah (Alfa)')" id="status-Tidak Sekolah (Alfa)" class="glass-card rounded-2xl p-4 flex flex-col items-center justify-center text-center transition hover:border-rose-500">
+                        <i data-lucide="user-x" class="w-7 h-7 mb-1.5 text-rose-400"></i>
+                        <span class="text-xs font-bold">Alfa</span>
+                        <span class="text-[10px] text-slate-400 mt-0.5">Tanpa Keterangan</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- FITUR 4: CATATAN/KETERANGAN -->
+            <section class="glass-panel rounded-2xl p-5 shadow-xl">
+                <label for="keteranganInput" class="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-2 mb-2">
+                    <i data-lucide="message-square" class="w-4 h-4"></i>
+                    Keterangan Tambahan (Opsional)
+                </label>
+                <input type="text" id="keteranganInput" placeholder="Contoh: Masuk shalat kloter 2 / Surat izin ada di piket..." class="w-full bg-dark-900/80 border border-slate-700/80 text-sm text-slate-100 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition">
+            </section>
+
+            <!-- TOMBOL SUBMIT -->
+            <div class="pt-2">
+                <button type="button" onclick="submitAttendance()" id="btnSubmit" class="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-slate-950 font-bold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 transform hover:-translate-y-0.5 active:translate-y-0">
+                    <i data-lucide="send" class="w-5 h-5"></i>
+                    <span id="btnText">Kirim Absensi Shalat Dzuhur</span>
+                </button>
+            </div>
+
+            <!-- Toast Notifikasi Status -->
+            <div id="toastNotification" class="hidden p-4 rounded-2xl text-sm font-semibold flex items-center justify-between transition-all">
+                <div class="flex items-center gap-3">
+                    <i id="toastIcon" data-lucide="check-circle" class="w-5 h-5"></i>
+                    <span id="toastMsg">Absensi berhasil dikirimkan!</span>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- MODAL POPUP SETTINGS URL -->
+    <div id="configModal" class="fixed inset-0 bg-dark-900/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="glass-panel rounded-3xl p-6 max-w-lg w-full border border-slate-700 shadow-2xl relative">
+            <button onclick="toggleConfigModal()" class="absolute top-5 right-5 text-slate-400 hover:text-white">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
+                    <i data-lucide="database" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-white text-lg">Konfigurasi Web App URL</h3>
+                    <p class="text-xs text-slate-400">Hubungkan web absensi ke Google Spreadsheet</p>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs font-semibold text-slate-300 block mb-1.5">Google Apps Script Web App URL:</label>
+                    <input type="text" id="scriptUrlInput" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-dark-900 border border-slate-700 rounded-xl p-3 text-xs text-slate-200 focus:outline-none focus:border-emerald-500">
+                </div>
+
+                <div class="flex gap-2">
+                    <button onclick="saveScriptUrl()" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-2.5 rounded-xl text-xs transition">
+                        Simpan URL
+                    </button>
+                    <button onclick="toggleConfigModal()" class="px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl">
+                        Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT LOGIC JAVASCRIPT -->
+    <script>
+    const STUDENTS = [
+        { no: 1, name: "AGIS NUR LISTIANI", gender: "P" },
+        { no: 2, name: "AL FACHRI", gender: "L" },
+        { no: 3, name: "ALMIRA RAHMATUNISSA FATHARANI", gender: "P" },
+        { no: 4, name: "ANANDARA WASYAFIATUNISA", gender: "P" },
+        { no: 5, name: "ANISA AGUSTIN", gender: "P" },
+        { no: 6, name: "AUREL KANYA BACHTIAR", gender: "P" },
+        { no: 7, name: "AZZA SYAKILA LUBIS", gender: "P" },
+        { no: 8, name: "CHANDRA DHIYA DARARIY SETYAWAN", gender: "L" },
+        { no: 9, name: "CLIANTA ALIMA PERMANA", gender: "P" },
+        { no: 10, name: "DEWI ARUM", gender: "P" },
+        { no: 11, name: "DEYYAN FARIZ RAMADHAN", gender: "L" },
+        { no: 12, name: "DHAFA FAUZAN FEBRIANA SETIA", gender: "L" },
+        { no: 13, name: "ELANG MULYA LESMANA", gender: "L" },
+        { no: 14, name: "FADLI AHSANUL HAKIM", gender: "L" },
+        { no: 15, name: "FIKRI NAKHLA RAFIE", gender: "L" },
+        { no: 16, name: "FREYA AZIA ALETHEA", gender: "P" },
+        { no: 17, name: "INTAN ADELIA PUTRI", gender: "P" },
+        { no: 18, name: "JAGAT ANTALOGAWA", gender: "L" },
+        { no: 19, name: "JELITA FITRIANI", gender: "P" },
+        { no: 20, name: "KARENINA TRI PERMATA", gender: "P" },
+        { no: 21, name: "KESYA ALMAIRA", gender: "P" },
+        { no: 22, name: "LINTANG RATIH PERTIWI", gender: "P" },
+        { no: 23, name: "MEGGA SETIAWAN", gender: "P" },
+        { no: 24, name: "MIA KAMELIA", gender: "P" },
+        { no: 25, name: "MUHAMAD AL ZAKKA", gender: "L" },
+        { no: 26, name: "MUHAMMAD NAUFAL ABDUSHOFWAN", gender: "L" },
+        { no: 27, name: "MUHAMMAD RIZKY SATRYA SUGANDI", gender: "L" },
+        { no: 28, name: "NABILA AZZAHRA", gender: "P" },
+        { no: 29, name: "NADIVA ASYELA PUTRI", gender: "P" },
+        { no: 30, name: "NAILA ARWA TUFFAHATI", gender: "P" },
+        { no: 31, name: "PUTRI ALISYA NURJAMAN", gender: "P" },
+        { no: 32, name: "QUEENZA FAIHA RIFDA", gender: "P" },
+        { no: 33, name: "RAHMA NURAENI", gender: "P" },
+        { no: 34, name: "RAKHA DWI PUTRA", gender: "L" },
+        { no: 35, name: "RAMADIAN MULYANA", gender: "L" },
+        { no: 36, name: "REZKY ADITYA", gender: "L" },
+        { no: 37, name: "RIFKIANSYAH MAHESA PRATAMA", gender: "L" },
+        { no: 38, name: "SALMA HERLINA", gender: "P" },
+        { no: 39, name: "SATYA DWI AIDY", gender: "L" },
+        { no: 40, name: "SHAQUILLE ADIWITYA MULYANA", gender: "L" },
+        { no: 41, name: "SILVY FITRIANI", gender: "P" },
+        { no: 42, name: "SINTA NURAENI", gender: "P" },
+        { no: 43, name: "SRI WIDIA NINGSIH", gender: "P" },
+        { no: 44, name: "TASYA HASNA JULIANTI", gender: "P" },
+        { no: 45, name: "WINA FITRIANI", gender: "P" }
+    ];
+
+    const DAYS = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"];
+    const ALL_STATUSES = ['Shalat', 'Halangan (Haid)', 'Tidak Sekolah (Sakit)', 'Tidak Sekolah (Izin)', 'Tidak Sekolah (Alfa)'];
+
+    let todayIndex = (new Date().getDay() + 6) % 7; // Menyesuaikan indeks Senin = 0 s/d Minggu = 6
+    let selectedDay = DAYS[todayIndex];
+    let selectedAttendance = "Shalat";
+    let webAppUrl = localStorage.getItem('absensi_script_url') || 'https://script.google.com/macros/s/AKfycbzMR-pCsRwEo0YAM_c52KslWfa2PjnSnx00d51HRJoJHaMWqTqsT5UDub5TWpW-sxrL/exec';
+
+    window.onload = function() {
+        lucide.createIcons();
+        initDays();
+        populateStudentDropdown(STUDENTS);
+        updateDateDisplay();
+    };
+
+    function initDays() {
+        const container = document.getElementById('daySelector');
+        container.innerHTML = '';
+
+        DAYS.forEach((day, index) => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.id = `day-${day}`;
+            
+            const isToday = (index === todayIndex);
+
+            // KUNCI PENGAMAN 1: Hanya hari ini yang aktif dan bisa diklik, hari lain diblokir/diredupkan
+            if (isToday) {
+                btn.className = 'py-2.5 rounded-xl text-xs font-bold transition flex flex-col items-center justify-center gap-1 border bg-emerald-500 text-slate-950 border-emerald-400 shadow-lg shadow-emerald-500/20 cursor-pointer';
+                btn.onclick = () => selectDay(day);
+            } else {
+                btn.className = 'py-2.5 rounded-xl text-xs font-bold transition flex flex-col items-center justify-center gap-1 border bg-dark-900/40 text-slate-600 border-slate-800 cursor-not-allowed opacity-50';
+                btn.title = "Absensi hari ini hanya bisa dilakukan pada hari yang bersangkutan.";
+            }
+
+            btn.innerHTML = `<span>${day}</span>${isToday ? '<span class="w-1.5 h-1.5 rounded-full bg-slate-950"></span>' : ''}`;
+            container.appendChild(btn);
+        });
+    }
+
+    function selectDay(day) {
+        // Memastikan hanya hari ini yang bisa dipilih
+        if (day !== DAYS[todayIndex]) {
+            showToast('Anda hanya dapat mengisi absensi untuk hari ini!', 'error');
+            return;
+        }
+        selectedDay = day;
+    }
+
+    function updateDateDisplay() {
+        const now = new Date();
+        const options = { day: 'numeric', month: 'short', year: 'numeric' };
+        document.getElementById('currentDateDisplay').innerText = now.toLocaleDateString('id-ID', options);
+    }
+
+    function populateStudentDropdown(list) {
+        const select = document.getElementById('studentSelect');
+        select.innerHTML = '<option value="" disabled selected>-- Ketuk untuk memilih nama siswa --</option>';
+        list.forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s.name;
+            opt.innerText = `${s.no}. ${s.name} (${s.gender})`;
+            select.appendChild(opt);
+        });
+    }
+
+    function filterStudents() {
+        const query = document.getElementById('searchStudent').value.toLowerCase();
+        const filtered = STUDENTS.filter(s => s.name.toLowerCase().includes(query) || s.no.toString() === query);
+        populateStudentDropdown(filtered);
+    }
+
+    function setAttendanceStatus(status) {
+        selectedAttendance = status;
+        ALL_STATUSES.forEach(st => {
+            const btn = document.getElementById(`status-${st}`);
+            if (btn) {
+                st === status ? btn.classList.add('active-tab') : btn.classList.remove('active-tab');
+            }
+        });
+    }
+
+    function toggleConfigModal() {
+        document.getElementById('configModal').classList.toggle('hidden');
+    }
+
+    function saveScriptUrl() {
+        const url = document.getElementById('scriptUrlInput').value.trim();
+        if(url) {
+            localStorage.setItem('absensi_script_url', url);
+            webAppUrl = url;
+            showToast('URL Google Apps Script berhasil disimpan!', 'success');
+            toggleConfigModal();
+        } else {
+            showToast('Harap masukkan URL yang valid.', 'error');
+        }
+    }
+
+    function showToast(message, type = 'success') {
+        const toast = document.getElementById('toastNotification');
+        const msgEl = document.getElementById('toastMsg');
+        const iconEl = document.getElementById('toastIcon');
+
+        toast.classList.remove('hidden', 'bg-emerald-500/10', 'text-emerald-400', 'border-emerald-500/20', 'bg-rose-500/10', 'text-rose-400', 'border-rose-500/20');
+
+        if (type === 'success') {
+            toast.classList.add('bg-emerald-500/10', 'text-emerald-400', 'border', 'border-emerald-500/20');
+            iconEl.setAttribute('data-lucide', 'check-circle');
+        } else {
+            toast.classList.add('bg-rose-500/10', 'text-rose-400', 'border', 'border-rose-500/20');
+            iconEl.setAttribute('data-lucide', 'alert-circle');
+        }
+
+        msgEl.innerText = message;
+        lucide.createIcons();
+
+        setTimeout(() => { toast.classList.add('hidden'); }, 4000);
+    }
+
+    function submitAttendance() {
+        const studentSelect = document.getElementById('studentSelect');
+        const selectedStudent = studentSelect.value;
+
+        if (!selectedStudent) {
+            showToast('Silakan pilih nama siswa terlebih dahulu!', 'error');
+            return;
+        }
+
+        // KUNCI PENGAMAN 2: Cek apakah siswa ini sudah pernah absen di perangkat ini hari ini
+        const todayKey = new Date().toISOString().split('T')[0]; // Format Tahun-Bulan-Hari (misal: 2026-06-06)
+        const storageKey = `absen_${selectedStudent}_${todayKey}`;
+        
+        if (localStorage.getItem(storageKey)) {
+            showToast(`Perhatian: ${selectedStudent} sudah melakukan absensi hari ini!`, 'error');
+            return;
+        }
+
+        if (!webAppUrl) {
+            showToast('Google Apps Script URL belum dikonfigurasi.', 'error');
+            toggleConfigModal();
+            return;
+        }
+
+        const btn = document.getElementById('btnSubmit');
+        const btnText = document.getElementById('btnText');
+        btn.disabled = true;
+        btnText.innerText = "Mengirim Data...";
+
+        const payload = {
+            hari: selectedDay,
+            nama: selectedStudent,
+            status: selectedAttendance,
+            keterangan: document.getElementById('keteranganInput').value || "-",
+            timestamp: new Date().toLocaleString('id-ID')
+        };
+
+        fetch(webAppUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+        .then(() => {
+            // Tandai di browser bahwa siswa ini sudah absen hari ini
+            localStorage.setItem(storageKey, 'true');
+
+            showToast(`Absensi Shalat Dzuhur [${selectedStudent}] Berhasil Terkirim!`, 'success');
+            studentSelect.selectedIndex = 0;
+            document.getElementById('keteranganInput').value = '';
+            setAttendanceStatus('Shalat');
+        })
+        .catch(() => {
+            showToast('Gagal mengirim absensi. Periksa koneksi internet Anda.', 'error');
+        })
+        .finally(() => {
+            btn.disabled = false;
+            btnText.innerText = "Kirim Absensi Shalat Dzuhur";
+        });
+    }
+</script>
+</body>
+</html>
